@@ -1,0 +1,27 @@
+# Builds the Glory Cosmetics mod for every supported Minecraft version. Run it from the Actions tab (Run workflow) or push a change under mod-src/glory-cosmetics.
+# Every version is built on its own, so one failing version does not hide the others. Download the jars from the run's Artifacts.
+name: Build Glory Cosmetics
+on:
+  workflow_dispatch:
+  push:
+    paths: ['mod-src/glory-cosmetics/**']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mc: [mc1_20_1, mc1_20_4, mc1_21_1, mc1_21_4, mc1_21_5]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.12' }
+      - name: Build ${{ matrix.mc }}
+        working-directory: mod-src/glory-cosmetics
+        run: gradle :${{ matrix.mc }}:build --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: glory-cosmetics-${{ matrix.mc }}
+          path: mod-src/glory-cosmetics/${{ matrix.mc }}/build/libs/glory-cosmetics-*[0-9].jar
