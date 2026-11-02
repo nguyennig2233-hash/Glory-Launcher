@@ -1,11 +1,11 @@
-# Builds the Glory Cosmetics mod for every supported Minecraft version (Fabric 1.16.5 to 1.21.5).
+# Builds the Glory Cosmetics mod (Fabric 1.16.5 to 1.21.5) and the Glory Menu mod (Fabric 1.20 to 1.21.5) for every supported Minecraft version.
 # Run it from the Actions tab (Run workflow). Every version builds on its own, so one failing version does not hide the others.
-# When it ends, the Artifacts section has one file per version plus "ALL-glory-cosmetics" with every jar together.
+# When it ends, the Artifacts section has one file per version plus "ALL-glory-mods" with every jar together.
 name: Build Glory Cosmetics
 on:
   workflow_dispatch:
   push:
-    paths: ['mod-src/mod-src/glory-cosmetics/**']
+    paths: ['mod-src/mod-src/mod-src (2)/**']
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,24 +15,47 @@ jobs:
         mc: [mc1_16_5, mc1_17_1, mc1_18_2, mc1_19_2, mc1_19_4, mc1_20_1, mc1_20_4, mc1_20_6, mc1_21_1, mc1_21_3, mc1_21_4, mc1_21_5]
     steps:
       - uses: actions/checkout@v4
+      - name: Copy sources to a clean path
+        run: mkdir -p src && cp -r "mod-src/mod-src/mod-src (2)/glory-cosmetics" src/
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 21 }
       - uses: gradle/actions/setup-gradle@v4
         with: { gradle-version: '8.12' }
       - name: Build ${{ matrix.mc }}
-        working-directory: mod-src/mod-src/glory-cosmetics
+        working-directory: src/glory-cosmetics
         run: gradle :${{ matrix.mc }}:build --stacktrace
       - uses: actions/upload-artifact@v4
         with:
           name: glory-cosmetics-${{ matrix.mc }}
-          path: mod-src/mod-src/glory-cosmetics/${{ matrix.mc }}/build/libs/glory-cosmetics-*[0-9].jar
+          path: src/glory-cosmetics/${{ matrix.mc }}/build/libs/glory-cosmetics-*[0-9].jar
+  build-menu:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mc: [mc1_20_1, mc1_20_4, mc1_20_6, mc1_21_1, mc1_21_4, mc1_21_5]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copy sources to a clean path
+        run: mkdir -p src && cp -r "mod-src/mod-src/mod-src (2)/glory-menu" src/
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.12' }
+      - name: Build menu ${{ matrix.mc }}
+        working-directory: src/glory-menu
+        run: gradle :${{ matrix.mc }}:build --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: glory-menu-${{ matrix.mc }}
+          path: src/glory-menu/${{ matrix.mc }}/build/libs/glory-menu-*[0-9].jar
   collect:
-    needs: build
+    needs: [build, build-menu]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
-        with: { pattern: 'glory-cosmetics-mc*', merge-multiple: true, path: all }
+        with: { pattern: 'glory-*-mc*', merge-multiple: true, path: all }
       - run: ls -l all
       - uses: actions/upload-artifact@v4
-        with: { name: ALL-glory-cosmetics, path: all/*.jar }
+        with: { name: ALL-glory-mods, path: all/*.jar }
