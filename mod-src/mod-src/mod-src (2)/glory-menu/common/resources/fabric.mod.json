@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "glorymenu",
+  "version": "${version}",
+  "name": "Glory Menu",
+  "description": "Draws the main menu you designed in Glory PvP Client (moved buttons, texts, images) and its wallpaper, still or animated.",
+  "authors": ["Glory PvP Client"],
+  "license": "All-Rights-Reserved",
+  "environment": "client",
+  "mixins": [{ "config": "glorymenu.mixins.json", "environment": "client" }],
+  "entrypoints": { "client": ["com.glory.menu.GloryMenuClient"] },
+  "depends": { "fabricloader": ">=0.15.0", "minecraft": "${mcdep}", "java": ">=${java}", "fabric-api": "*" }
+}

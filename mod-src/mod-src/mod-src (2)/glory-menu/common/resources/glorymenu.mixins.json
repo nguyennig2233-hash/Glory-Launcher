@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "com.glory.menu.mixin",
+  "compatibilityLevel": "${jv}",
+  "client": ["ScreenAccessor", "WidgetAccessor"],
+  "injectors": { "defaultRequire": 1 }
+}

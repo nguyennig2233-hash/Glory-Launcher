@@ -1,0 +1,9 @@
+pluginManagement {
+    repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+        gradlePluginPortal()
+    }
+}
+rootProject.name = 'glory-menu'
+// One Gradle project per Minecraft version range. They share common/ and one small Compat.java per adapter (adapters/).
+include 'mc1_20_1', 'mc1_20_4', 'mc1_20_6', 'mc1_21_1', 'mc1_21_4', 'mc1_21_5'
